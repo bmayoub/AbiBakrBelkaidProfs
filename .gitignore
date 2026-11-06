@@ -8,7 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+# dist is included so hosting platforms (like Glitch) don't need to rebuild with high memory
+# dist
 dist-ssr
 *.local
 
