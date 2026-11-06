@@ -276,7 +276,8 @@ async function initMongo() {
 
     // Fetch existing data from MongoDB Atlas
     const cloudDoc = await mongoCollection.findOne({ _id: 'main_db' });
-    if (cloudDoc) {
+    const localData = readDb();
+    if (cloudDoc && cloudDoc.teachers && cloudDoc.teachers.length >= (localData.teachers || []).length) {
       delete cloudDoc._id;
       // Sync cloud data to local db.json
       const tempFile = `${DB_FILE}.tmp`;
@@ -284,15 +285,14 @@ async function initMongo() {
       fs.renameSync(tempFile, DB_FILE);
       console.log('Database state synced from MongoDB Atlas cloud!');
     } else {
-      // First time initialization: upload current local db.json to cloud
-      console.log('First time setup: uploading local database to MongoDB Atlas...');
-      const localData = readDb();
+      // Cloud is either empty or has fewer teachers: upload latest local database to cloud
+      console.log('Uploading latest database with all teachers to MongoDB Atlas...');
       await mongoCollection.replaceOne(
         { _id: 'main_db' },
         { ...localData, _id: 'main_db' },
         { upsert: true }
       );
-      console.log('Uploaded initial data to MongoDB Atlas!');
+      console.log('Uploaded latest data to MongoDB Atlas!');
     }
   } catch (err) {
     mongoErrorMsg = err.message;
@@ -337,9 +337,10 @@ app.get('/api/db-status', async (req, res) => {
 
   if (mongoCollection) {
     try {
-      await mongoCollection.database.command({ ping: 1 });
+      await mongoCollection.countDocuments();
       mongoConnected = true;
       cloudDoc = await mongoCollection.findOne({ _id: 'main_db' });
+      mongoErrorMsg = null;
     } catch (e) {
       mongoErrorMsg = e.message;
     }
