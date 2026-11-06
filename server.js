@@ -256,11 +256,13 @@ function readDb() {
 
 // MongoDB Atlas connection state
 let mongoCollection = null;
+let mongoErrorMsg = null;
 
 async function initMongo() {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
-    console.log('No MONGODB_URI configured. Running with local filesystem database.');
+    mongoErrorMsg = 'No MONGODB_URI configured in environment variables.';
+    console.log(mongoErrorMsg + ' Running with local filesystem database.');
     return;
   }
   try {
@@ -269,6 +271,7 @@ async function initMongo() {
     await client.connect();
     const db = client.db('profs_db');
     mongoCollection = db.collection('app_state');
+    mongoErrorMsg = null;
     console.log('Connected successfully to MongoDB Atlas!');
 
     // Fetch existing data from MongoDB Atlas
@@ -292,6 +295,7 @@ async function initMongo() {
       console.log('Uploaded initial data to MongoDB Atlas!');
     }
   } catch (err) {
+    mongoErrorMsg = err.message;
     console.error('MongoDB Atlas notice:', err.message);
     console.log('Continuing with local filesystem storage.');
   }
@@ -310,7 +314,10 @@ function writeDb(data) {
         { _id: 'main_db' },
         { ...data, _id: 'main_db' },
         { upsert: true }
-      ).catch((e) => console.error('Error saving to MongoDB Atlas:', e.message));
+      ).catch((e) => {
+        mongoErrorMsg = e.message;
+        console.error('Error saving to MongoDB Atlas:', e.message);
+      });
     }
     return true;
   } catch (err) {
@@ -321,6 +328,55 @@ function writeDb(data) {
 
 // Initialize on start
 readDb();
+
+// Diagnostic & Cloud Sync Status Route
+app.get('/api/db-status', async (req, res) => {
+  const hasEnv = !!process.env.MONGODB_URI;
+  let mongoConnected = false;
+  let cloudDoc = null;
+
+  if (mongoCollection) {
+    try {
+      await mongoCollection.database.command({ ping: 1 });
+      mongoConnected = true;
+      cloudDoc = await mongoCollection.findOne({ _id: 'main_db' });
+    } catch (e) {
+      mongoErrorMsg = e.message;
+    }
+  }
+
+  res.json({
+    status: mongoConnected ? 'connected' : 'offline',
+    hasEnv,
+    mongoConnected,
+    cloudSaved: !!cloudDoc,
+    teachersCountInCloud: cloudDoc?.teachers?.length || 0,
+    activeLocalTeachersCount: (readDb().teachers || []).length,
+    mongoError: mongoErrorMsg
+  });
+});
+
+// Manual force upload to cloud
+app.post('/api/sync-to-cloud', async (req, res) => {
+  if (!mongoCollection) {
+    return res.status(500).json({
+      success: false,
+      error: 'MongoDB Atlas is not connected yet.',
+      details: mongoErrorMsg
+    });
+  }
+  try {
+    const localData = readDb();
+    await mongoCollection.replaceOne(
+      { _id: 'main_db' },
+      { ...localData, _id: 'main_db' },
+      { upsert: true }
+    );
+    res.json({ success: true, message: 'All local data uploaded to MongoDB Atlas cloud!' });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
 
 // --- AUTH & CONFIG ROUTES ---
 app.get('/api/config', (req, res) => {
