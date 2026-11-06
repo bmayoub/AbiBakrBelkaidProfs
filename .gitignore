@@ -13,6 +13,12 @@ node_modules
 dist-ssr
 *.local
 
+# Environment & sensitive credentials
+.env
+.env.*
+*.env
+atlas-credentials.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

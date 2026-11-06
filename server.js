@@ -3,9 +3,18 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { MongoClient } from 'mongodb';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables (supports atlas-credentials.env or .env)
+if (fs.existsSync(path.join(__dirname, 'atlas-credentials.env'))) {
+  dotenv.config({ path: path.join(__dirname, 'atlas-credentials.env') });
+} else {
+  dotenv.config();
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -241,12 +250,64 @@ function readDb() {
   }
 }
 
-// Helper to write DB atomically
+// MongoDB Atlas connection state
+let mongoCollection = null;
+
+async function initMongo() {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    console.log('No MONGODB_URI configured. Running with local filesystem database.');
+    return;
+  }
+  try {
+    console.log('Connecting to MongoDB Atlas...');
+    const client = new MongoClient(uri, { serverSelectionTimeoutMS: 10000 });
+    await client.connect();
+    const db = client.db('profs_db');
+    mongoCollection = db.collection('app_state');
+    console.log('Connected successfully to MongoDB Atlas!');
+
+    // Fetch existing data from MongoDB Atlas
+    const cloudDoc = await mongoCollection.findOne({ _id: 'main_db' });
+    if (cloudDoc) {
+      delete cloudDoc._id;
+      // Sync cloud data to local db.json
+      const tempFile = `${DB_FILE}.tmp`;
+      fs.writeFileSync(tempFile, JSON.stringify(cloudDoc, null, 2), 'utf-8');
+      fs.renameSync(tempFile, DB_FILE);
+      console.log('Database state synced from MongoDB Atlas cloud!');
+    } else {
+      // First time initialization: upload current local db.json to cloud
+      console.log('First time setup: uploading local database to MongoDB Atlas...');
+      const localData = readDb();
+      await mongoCollection.replaceOne(
+        { _id: 'main_db' },
+        { ...localData, _id: 'main_db' },
+        { upsert: true }
+      );
+      console.log('Uploaded initial data to MongoDB Atlas!');
+    }
+  } catch (err) {
+    console.error('MongoDB Atlas notice:', err.message);
+    console.log('Continuing with local filesystem storage.');
+  }
+}
+
+// Helper to write DB atomically & sync with MongoDB Atlas
 function writeDb(data) {
   try {
     const tempFile = `${DB_FILE}.tmp`;
     fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
     fs.renameSync(tempFile, DB_FILE);
+
+    // Asynchronously update MongoDB Atlas
+    if (mongoCollection) {
+      mongoCollection.replaceOne(
+        { _id: 'main_db' },
+        { ...data, _id: 'main_db' },
+        { upsert: true }
+      ).catch((e) => console.error('Error saving to MongoDB Atlas:', e.message));
+    }
     return true;
   } catch (err) {
     console.error('Error writing DB:', err);
@@ -1013,6 +1074,9 @@ if (fs.existsSync(distPath)) {
     next();
   });
 }
+
+// Connect to MongoDB Atlas if configured, then start server
+await initMongo();
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
