@@ -73,7 +73,7 @@ export default function CoordinatorAdminTab({
 
   // Config Form State
   const [academicYear, setAcademicYear] = useState(config?.academicYear || '2026/2027');
-  const [schoolName, setSchoolName] = useState(config?.schoolName || 'ثانوية الشهيد رابح بيطاط');
+  const [schoolName, setSchoolName] = useState(config?.schoolName || 'ثانوية أبي بكر بلقايد - النزلة');
   const [wilaya, setWilaya] = useState(config?.wilaya || 'الجزائر');
   const [institutionPasscode, setInstitutionPasscode] = useState(config?.institutionPasscode || '0001');
   const [coordinatorPasscode, setCoordinatorPasscode] = useState(config?.coordinatorPasscode || '0000');
@@ -858,7 +858,7 @@ export default function CoordinatorAdminTab({
                 required
                 value={schoolName}
                 onChange={(e) => setSchoolName(e.target.value)}
-                placeholder="ثانوية الشهيد رابح بيطاط"
+                placeholder="ثانوية أبي بكر بلقايد - النزلة"
                 className="w-full text-xs font-semibold py-2.5 px-3 rounded-xl border border-slate-200 focus:border-blue-600 outline-none"
               />
             </div>

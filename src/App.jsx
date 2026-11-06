@@ -577,7 +577,7 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 no-print">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <span>منصة التنسيق البيداغوجي لمادة العلوم الفيزيائية • {config?.schoolName || 'ثانوية الشهيد رابح بيطاط'}</span>
+          <span>منصة التنسيق البيداغوجي لمادة العلوم الفيزيائية • {config?.schoolName || 'ثانوية أبي بكر بلقايد - النزلة'}</span>
           <span className="font-mono text-slate-400">السنة الدراسية: {config?.academicYear || '2026/2027'}</span>
         </div>
       </footer>

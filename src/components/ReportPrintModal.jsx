@@ -71,7 +71,7 @@ export default function ReportPrintModal({
             <div className="flex justify-between text-xs font-semibold pt-2 text-slate-700">
               <span>مديرية التربية لولاية: {config.wilaya || 'الجزائر'}</span>
               <span>السنة الدراسية: {config.academicYear || '2026/2027'}</span>
-              <span>المؤسسة: {config.schoolName || 'ثانوية الشهيد رابح بيطاط'}</span>
+              <span>المؤسسة: {config.schoolName || 'ثانوية أبي بكر بلقايد - النزلة'}</span>
             </div>
             <div className="pt-2">
               <span className="inline-block bg-slate-100 border border-slate-300 px-6 py-1.5 rounded-full text-base font-black text-slate-900">

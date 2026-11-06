@@ -21,7 +21,7 @@ export default function Header({
           <span>الجمهورية الجزائرية الديمقراطية الشعبية • وزارة التربية الوطنية</span>
         </div>
         <div className="flex items-center gap-4">
-          <span>{config?.schoolName || 'ثانوية الشهيد رابح بيطاط'}</span>
+          <span>{config?.schoolName || 'ثانوية أبي بكر بلقايد - النزلة'}</span>
           <span className="text-slate-500">|</span>
           <span className="text-amber-400 font-bold font-mono">السنة الدراسية: {config?.academicYear || '2026/2027'}</span>
         </div>

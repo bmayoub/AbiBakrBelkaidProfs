@@ -60,16 +60,20 @@ const INITIAL_DATA = {
     institutionPasscode: '0001',
     coordinatorPasscode: '0000',
     academicYear: '2026/2027',
-    schoolName: 'ثانوية الشهيد رابح بيطاط',
-    wilaya: 'الجزائر',
+    schoolName: 'ثانوية أبي بكر بلقايد - النزلة',
+    wilaya: 'تقرت',
     subject: 'العلوم الفيزيائية'
   },
   teachers: [
-    { id: 't_benmohamed', name: 'الأستاذ بن محمد أيوب', pin: '0000', isCoordinator: true, phone: '0550000000', notes: 'أستاذ منسق المادة' },
-    { id: 't1', name: 'الأستاذ عبية', pin: '1111', isCoordinator: false, phone: '0550000001', notes: 'أستاذ مادة' },
-    { id: 't2', name: 'الأستاذ مختاري', pin: '2222', isCoordinator: false, phone: '0550000002', notes: 'أستاذ مادة' },
-    { id: 't3', name: 'الأستاذة بن سالم', pin: '3333', isCoordinator: false, phone: '0550000003', notes: 'أستاذة مادة' },
-    { id: 't4', name: 'الأستاذ قاسم', pin: '4444', isCoordinator: false, phone: '0550000004', notes: 'أستاذ مادة' }
+    { id: 't_benmohamed', name: 'الأستاذ بن محمد أيوب', pin: '0000', isCoordinator: true, phone: '0770181495', notes: 'أستاذ منسق المادة' },
+    { id: 't1', name: 'الأستاذ عبية صالح', pin: '1111', isCoordinator: false, phone: '', notes: 'أستاذ مادة' },
+    { id: 't2', name: 'الأستاذ مختاري يوسف', pin: '2222', isCoordinator: false, phone: '', notes: 'أستاذ مادة' },
+    { id: 't_hadri', name: 'الأستاذة حضري سومية', pin: '6666', isCoordinator: false, phone: '', notes: 'أستاذة مادة' },
+    { id: 't_mehdadi', name: 'الأستاذة محدادي رقية', pin: '3333', isCoordinator: false, phone: '', notes: 'أستاذة مادة' },
+    { id: 't_gammari', name: 'الأستاذة قماري فاطمة', pin: '4444', isCoordinator: false, phone: '', notes: 'أستاذة مادة' },
+    { id: 't_bouhania', name: 'الأستاذ بوحنية', pin: '5555', isCoordinator: false, phone: '', notes: 'أستاذ مادة' },
+    { id: 't_rahmani', name: 'الأستاذة رحماني زينب', pin: '7777', isCoordinator: false, phone: '', notes: 'أستاذة مادة' },
+    { id: 't_zennou', name: 'الأستاذة زنو كريمة', pin: '8888', isCoordinator: false, phone: '', notes: 'أستاذة مادة' }
   ],
   classes: [
     { id: 'c1', name: '3 ع ت 1', streamId: '3as_se', teacherId: 't_benmohamed' },

@@ -55,7 +55,7 @@ export default function PasscodeGate({ onUnlock, schoolName, academicYear }) {
         <div className="mt-4 mb-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-2">
             <School className="w-3.5 h-3.5" />
-            {schoolName || 'ثانوية الشهيد رابح بيطاط'}
+            {schoolName || 'ثانوية أبي بكر بلقايد - النزلة'}
           </span>
           <h1 className="text-2xl font-black text-slate-800">
             فضاء أساتذة العلوم الفيزيائية

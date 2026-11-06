@@ -95,7 +95,7 @@ export default function TeacherCredentialsPrintModal({
               جدول كلمات مرور أساتذة مادة العلوم الفيزيائية
             </h2>
             <div className="flex items-center justify-between text-xs font-bold text-slate-600 pt-1">
-              <span>{config.schoolName || 'ثانوية الشهيد رابح بيطاط'}</span>
+              <span>{config.schoolName || 'ثانوية أبي بكر بلقايد - النزلة'}</span>
               <span>السنة الدراسية: {config.academicYear || '2026/2027'}</span>
             </div>
           </div>
