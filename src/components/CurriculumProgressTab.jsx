@@ -235,23 +235,23 @@ export default function CurriculumProgressTab({
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-4 relative z-10">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-4 sm:p-6 text-white shadow-xl relative overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 relative z-10">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-200 text-xs font-semibold mb-2 border border-indigo-500/30">
               <BookOpen className="w-3.5 h-3.5" />
               <span>التوزيع السنوي الرسمي 2026/2027</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black">
+            <h2 className="text-lg sm:text-2xl font-black">
               التأشير الأسبوعي وتتبع التدرج البيداغوجي
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
               يقوم الأساتذة أسبوعياً بالتأشير على الحصص والوحدات المنجزة لحساب نسبة تقدم كل قسم آلياً ومقارنتها مع بقية الزملاء.
             </p>
           </div>
 
           {/* SubTab switcher & Coordinator Report Button */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {currentRole === 'coordinator' && onOpenProgressReport && (
               <button
                 onClick={onOpenProgressReport}
@@ -263,10 +263,10 @@ export default function CurriculumProgressTab({
               </button>
             )}
 
-            <div className="flex items-center bg-white/10 p-1.5 rounded-2xl backdrop-blur-xs border border-white/10">
+            <div className="flex items-center bg-white/10 p-1 sm:p-1.5 rounded-2xl backdrop-blur-xs border border-white/10 w-full sm:w-auto justify-center">
               <button
                 onClick={() => setSubTab('my_classes')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                   subTab === 'my_classes'
                     ? 'bg-indigo-600 text-white shadow-md'
                     : 'text-indigo-200 hover:text-white'
@@ -278,14 +278,14 @@ export default function CurriculumProgressTab({
 
               <button
                 onClick={() => setSubTab('all_teachers')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                   subTab === 'all_teachers'
                     ? 'bg-indigo-600 text-white shadow-md'
                     : 'text-indigo-200 hover:text-white'
                 }`}
               >
                 <Users className="w-4 h-4" />
-                <span>مقارنة تقدم جميع الأساتذة</span>
+                <span>مقارنة تقدم الأساتذة</span>
               </button>
             </div>
           </div>
@@ -294,19 +294,19 @@ export default function CurriculumProgressTab({
 
       {/* VIEW 1: MY CLASSES & CHECKLIST */}
       {subTab === 'my_classes' && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Class Selector Pills */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-3.5 sm:p-4 shadow-xs">
+            <div className="flex items-center justify-between mb-2.5">
               <span className="text-xs font-bold text-slate-500">اختر القسم للمتابعة والتأشير:</span>
               {currentRole === 'coordinator' && (
-                <span className="text-[11px] text-blue-600 font-bold bg-blue-50 px-2.5 py-0.5 rounded-full">
+                <span className="text-[10px] sm:text-[11px] text-blue-600 font-bold bg-blue-50 px-2.5 py-0.5 rounded-full">
                   وضع المنسق (جميع أقسام المؤسسة)
                 </span>
               )}
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {(currentRole === 'coordinator' ? classes : myClasses).map((cls) => {
                 const curr = CURRICULA[cls.streamId];
                 const pct = calculateClassPercentage(cls);
@@ -553,20 +553,25 @@ export default function CurriculumProgressTab({
                         return (
                           <tr
                             key={index}
-                            className={`transition-colors ${
+                            onClick={() => !isHoliday && onToggleWeek(selectedClass.id, w.num)}
+                            className={`transition-colors select-none ${
                               isHoliday
                                 ? 'bg-amber-50/50 text-amber-900'
                                 : isChecked
-                                ? 'bg-indigo-50/40 text-slate-900'
-                                : 'hover:bg-slate-50/80 text-slate-700'
+                                ? 'bg-indigo-50/40 text-slate-900 cursor-pointer active:bg-indigo-100/60'
+                                : 'hover:bg-slate-50/80 text-slate-700 cursor-pointer active:bg-slate-100'
                             }`}
                           >
                             {/* Checkbox */}
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-center">
                               {!isHoliday ? (
                                 <button
-                                  onClick={() => onToggleWeek(selectedClass.id, w.num)}
-                                  className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleWeek(selectedClass.id, w.num);
+                                  }}
+                                  className={`w-7 h-7 sm:w-6 sm:h-6 rounded-lg border flex items-center justify-center transition-all mx-auto ${
                                     isChecked
                                       ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
                                       : 'border-slate-300 bg-white hover:border-indigo-400'
@@ -584,12 +589,12 @@ export default function CurriculumProgressTab({
                             </td>
 
                             {/* Week Number */}
-                            <td className="py-3 px-4 text-center font-mono font-bold text-slate-800">
+                            <td className="py-2.5 sm:py-3 px-3 sm:px-4 text-center font-mono font-bold text-slate-800">
                               {w.num}
                             </td>
 
                             {/* Date range */}
-                            <td className="py-3 px-4 font-mono text-[11px] text-slate-500" dir="ltr">
+                            <td className="py-2.5 sm:py-3 px-3 sm:px-4 font-mono text-[10px] sm:text-[11px] text-slate-500 whitespace-nowrap" dir="ltr">
                               {w.dates}
                             </td>
 

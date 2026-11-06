@@ -487,7 +487,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className={`flex-1 ${activeTab === 'coordination' ? 'max-w-[1700px]' : 'max-w-7xl'} w-full mx-auto p-4 sm:p-6 lg:p-8 no-print`}>
+      <main className={`flex-1 ${activeTab === 'coordination' ? 'max-w-[1700px]' : 'max-w-7xl'} w-full mx-auto p-3 sm:p-6 lg:p-8 no-print`}>
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400">
             <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-3"></div>

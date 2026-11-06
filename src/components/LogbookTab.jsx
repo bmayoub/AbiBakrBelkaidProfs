@@ -272,37 +272,37 @@ export default function LogbookTab({
     <div className="space-y-6" style={{ direction: 'rtl' }}>
       
       {/* Top Banner: Class Selector & Quick Progress Metrics */}
-      <div className="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-5 sm:p-6 transition-all">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+      <div className="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-4 sm:p-6 transition-all">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 border-b border-slate-100 pb-4 sm:pb-5">
           {/* Service Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
-              <BookOpen className="w-6 h-6" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-black text-slate-800 tracking-tight">
-                  دفتر النصوص: التأشير على الدروس المنجزة
+                <h2 className="text-base sm:text-xl font-black text-slate-800 tracking-tight">
+                  دفتر النصوص: التأشير على الدروس
                 </h2>
-                <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  السير المنهجي للتعلمات
+                <span className="px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                  السير المنهجي
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                يؤشر الأستاذ مباشرة على الدروس والأنشطة والتجارب التي تم تدريسها في القسم
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                يؤشر الأستاذ مباشرة على الدروس والأنشطة المنجزة في القسم
               </p>
             </div>
           </div>
 
           {/* Class Switcher, Print & Coordinator Actions */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Class Dropdown */}
-            <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-200">
-              <span className="text-xs font-bold text-slate-600">القسم:</span>
+            <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-200 w-full sm:w-auto">
+              <span className="text-xs font-bold text-slate-600 shrink-0">القسم:</span>
               <select
                 value={selectedClassId}
                 onChange={(e) => setSelectedClassId(e.target.value)}
-                className="bg-transparent font-black text-slate-800 text-sm focus:outline-hidden cursor-pointer"
+                className="bg-transparent font-black text-slate-800 text-xs sm:text-sm focus:outline-hidden cursor-pointer w-full"
               >
                 {myClasses.map((cls) => (
                   <option key={cls.id} value={cls.id}>
@@ -317,19 +317,19 @@ export default function LogbookTab({
               <>
                 <button
                   onClick={handleOpenAddUnit}
-                  className="px-3.5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                  className="px-3 py-1.5 sm:py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition cursor-pointer"
                   title="إضافة وحدة تعليمية جديدة لمنهاج هذه الشعبة"
                 >
                   <FolderPlus className="w-4 h-4" />
-                  <span>إضافة وحدة جديدة</span>
+                  <span>إضافة وحدة</span>
                 </button>
 
                 <button
                   onClick={handleResetSyllabusClick}
-                  className="px-3 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition cursor-pointer"
+                  className="px-3 py-1.5 sm:py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition cursor-pointer"
                   title="استعادة منهاج دفتر النصوص الوزاري الأصلي لهذه الشعبة"
                 >
-                  <span>استعادة المنهاج الأصلي</span>
+                  <span>استعادة الأصلي</span>
                 </button>
               </>
             )}
@@ -337,10 +337,10 @@ export default function LogbookTab({
             {/* Print Official Cahier Button */}
             <button
               onClick={() => setShowPrintModal(true)}
-              className="px-4 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-2 transition cursor-pointer border border-emerald-200 shadow-xs"
+              className="px-3.5 py-1.5 sm:py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer border border-emerald-200 shadow-xs"
             >
               <Printer className="w-4 h-4 text-emerald-600" />
-              <span>طباعة دفتر النصوص (A4)</span>
+              <span>طباعة دفتر النصوص</span>
             </button>
           </div>
         </div>
@@ -614,14 +614,14 @@ export default function LogbookTab({
                             }`}
                           >
                             {/* Checkbox */}
-                            <td className="py-3 px-4 text-center">
+                            <td className="py-2.5 sm:py-3 px-2 sm:px-4 text-center">
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleItemClick(item.id);
                                 }}
-                                className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all mx-auto cursor-pointer ${
+                                className={`w-7 h-7 sm:w-6 sm:h-6 rounded-lg border flex items-center justify-center transition-all mx-auto cursor-pointer ${
                                   isChecked
                                     ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                                     : 'border-slate-300 bg-white hover:border-emerald-400'
@@ -636,12 +636,12 @@ export default function LogbookTab({
                             </td>
 
                             {/* Item Index */}
-                            <td className="py-3 px-4 text-center font-mono font-bold text-slate-400">
+                            <td className="py-2.5 sm:py-3 px-2 sm:px-4 text-center font-mono font-bold text-slate-400">
                               {itemIdx + 1}
                             </td>
 
                             {/* Activity Type Badge */}
-                            <td className="py-3 px-4 text-center whitespace-nowrap">
+                            <td className="py-2.5 sm:py-3 px-2 sm:px-4 text-center whitespace-nowrap">
                               <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
                                 item.type === 'عمل مخبري'
                                   ? 'bg-amber-100 text-amber-900 border border-amber-200'
@@ -654,8 +654,8 @@ export default function LogbookTab({
                             </td>
 
                             {/* Lesson Title */}
-                            <td className="py-3 px-4">
-                              <span className={`font-bold leading-relaxed ${
+                            <td className="py-2.5 sm:py-3 px-2 sm:px-4">
+                              <span className={`block font-bold text-xs sm:text-sm leading-relaxed ${
                                 isChecked ? 'text-emerald-950 font-black' : 'text-slate-800'
                               }`}>
                                 {item.title}

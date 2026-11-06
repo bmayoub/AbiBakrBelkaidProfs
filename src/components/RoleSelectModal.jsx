@@ -41,23 +41,23 @@ export default function RoleSelectModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden text-right">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden text-right max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 relative">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600/50 border border-indigo-400/30 flex items-center justify-center mx-auto mb-3">
-            <User className="w-6 h-6 text-indigo-200" />
+        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-6 relative shrink-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-indigo-600/50 border border-indigo-400/30 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+            <User className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-200" />
           </div>
-          <h2 className="text-xl font-black text-center">
+          <h2 className="text-lg sm:text-xl font-black text-center">
             تسجيل دخول الأستاذ
           </h2>
-          <p className="text-xs text-indigo-200 text-center mt-1">
+          <p className="text-[11px] sm:text-xs text-indigo-200 text-center mt-1">
             اختر اسمك من القائمة المنسدلة ثم أدخل كلمة المرور الخاصة بك
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3.5 sm:space-y-4 overflow-y-auto flex-1">
           {/* Dropdown Selection */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">
