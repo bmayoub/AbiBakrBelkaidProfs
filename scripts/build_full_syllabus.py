@@ -1,145 +1,344 @@
-# -*- coding: utf-8 -*-
-"""
-Generate complete syllabusData.js for all streams based on curricula.js and ministerial PDF files.
-"""
-
-import json
+import os
 import re
+import json
+import pypdf
 
-# Comprehensive syllabus definitions matching Algerian curriculum & PDF 'السير المنهجي لتدرج التعلمات'
-SYLLABUS = {
-  "3as_se": {
-    "streamId": "3as_se",
-    "streamName": "3 علوم تجريبية",
-    "code": "3 ع ت",
-    "units": [
-      {
-        "id": "3as_se_u1",
-        "number": 1,
-        "title": "01: المتابعة الزمنية لتحول كيميائي في وسط مائي",
-        "hours": "06 سا + 03 أ م",
-        "items": [
-          {"id": "3as_se_u1_1", "title": "مكتسبات قبلية: حساب كمية المادة، جدول تقدم التفاعل، تفاعلات الأكسدة والإرجاع", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u1_2", "title": "التمييز بين مختلف أنواع التحولات الكيميائية: السريعة، البطيئة، والبطيئة جداً", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u1_3", "title": "عمل مخبري: المتابعة الزمنية لتحول كيميائي عن طريق المعايرة اللونية وتعيين التقدم x(t)", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u1_4", "title": "عمل مخبري: المتابعة الزمنية عن طريق قياس الناقلية النوعية σ(t)", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u1_5", "title": "المتابعة الزمنية عن طريق قياس ضغط غاز أو حجم غاز منطلق", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u1_6", "title": "تعريف وتعيين زمن نصف التفاعل t1/2 وأهميته في مراقبة التفاعل", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u1_7", "title": "تعريف سرعة التفاعل، السرعة الحجمية للتفاعل، وسرعات التشكل والاختفاء وطرق حسابها بيانياً", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u1_8", "title": "عمل مخبري: دراسة تأثير العوامل الحركية (درجة الحرارة، التراكيز الابتدائية، مساحة سطح التلامس، الوساطة)", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u1_9", "title": "التفسير المجهري لتأثير العوامل الحركية: مفهوم التصادمات الفعالة وطاقة التنشيط", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u1_10", "title": "أعمال موجهة: حل تمارين ومسائل نموذجية حول المتابعة الزمنية والسرعات الحجمية", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      },
-      {
-        "id": "3as_se_u2",
-        "number": 2,
-        "title": "02: تطور جملة ميكانيكية",
-        "hours": "10 سا + 05 أ م",
-        "items": [
-          {"id": "3as_se_u2_1", "title": "مكتسبات قبلية: مراجعة المرجع والموضع وشعاع السرعة والقانونين الأول والثالث لنيوتن", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u2_2", "title": "مفهوم شعاع التسارع في الحركات المستقيمة والمنحنية واستنتاج القانون الثاني لنيوتن", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u2_3", "title": "دراسة حركة الكواكب والأقمار الاصطناعية: المراجع العطالية وقوانين كبلر الثلاثة", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u2_4", "title": "تطبيق القانون الثاني لنيوتن على حركة كوكب أو قمر اصطناعي: السرعة المدارية والدور والقمر الجيومستقر", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u2_5", "title": "عمل مخبري: دراسة السقوط الشاقولي لجسم صلب في الهواء بواسطة التصوير المتعاقب أو برمجية محاكاة", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u2_6", "title": "القوى المؤثرة في السقوط الشاقولي الحقيقي: الثقل، دافعة أرخميدس، وقوة الاحتكاك مع المائع", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u2_7", "title": "المعادلة التفاضلية لحركة السقوط الشاقولي في مائع وحلها وتعيين السرعة الحدية vl وثابت الزمن τ", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u2_8", "title": "السقوط الحر للأجسام الصلبة: الشروط والمعادلة التفاضلية والمعادلات الزمنية للحركة", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u2_9", "title": "عمل مخبري: دراسة حركة قذيفة في حقل الجاذبية الأرضية المنتظم", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u2_10", "title": "حركة القذائف: الشروط الابتدائية، المعادلات الزمنية للسرعة والموضع، ومعادلة المسار", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u2_11", "title": "خصائص حركة القذيفة: الذروة، المدى، وزاوية القذف وتطبيقاتها", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u2_12", "title": "دراسة حركة جسم صلب على مستو مائل ومستو أفقي بتطبيق القانون الثاني لنيوتن ومبدأ انحفاظ الطاقة", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u2_13", "title": "أعمال موجهة: حل تمارين شاملة حول حركة الأقمار، السقوط الشاقولي، والقذائف", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      },
-      {
-        "id": "3as_se_u3",
-        "number": 3,
-        "title": "03: دراسة ظواهر كهربائية",
-        "hours": "08 سا + 03 أ م",
-        "items": [
-          {"id": "3as_se_u3_1", "title": "المكثفة: بنيتها، سعتها C، والعلاقة بين الشحنة والتوتر q = C.uC ورابط التجميع", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u3_2", "title": "عمل مخبري: دراسة شحن وتفريغ مكثفة عبر ناقل أومي (ثنائي القطب RC) ورسم منحنيات uC(t)", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u3_3", "title": "المعادلة التفاضلية لدارة RC أثناء الشحن: التعبير الرياضي والحل وتعيين ثابت الزمن τ = RC بيانيا وحسابيا", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u3_4", "title": "المعادلة التفاضلية لتفريغ مكثفة في ناقل أومي، عبارة شدة التيار i(t)، والطاقة المخزنة في المكثفة Ec", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u3_5", "title": "الوشيعة: مفهوم التحريض الذاتي، ذاتية الوشيعة L ومقاومتها الداخلية r وتوتر طرفيها", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u3_6", "title": "عمل مخبري: دراسة استجابة ثنائي القطب RL لرتبة توتر صاعدة وتأثير الوشيعة في تأخير إقامة التيار", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u3_7", "title": "المعادلة التفاضلية لشدة التيار i(t) في دارة RL عند إقامة وانقطاع التيار، حلها وثابت الزمن τ = L/R", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u3_8", "title": "الطاقة الكهرومغناطيسية المخزنة في الوشيعة EL = 1/2 L i² ومقارنتها بدارة المكثفة", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u3_9", "title": "أعمال موجهة: حل تمارين ومسائل البكالوريا حول الدارات RC و RL وتوظيف راسم الاهتزاز المهبطي", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      },
-      {
-        "id": "3as_se_u4",
-        "number": 4,
-        "title": "04: تطور جملة كيميائية نحو حالة التوازن",
-        "hours": "08 سا + 04 أ م",
-        "items": [
-          {"id": "3as_se_u4_1", "title": "مفهوم الـ pH للمحاليل المائية المخففة وعلاقته بتركيز شوارد الهيدرونيوم [H3O+] وكيفية قياسه", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u4_2", "title": "التحولات الكيميائية التامة وغير التامة: حساب نسبة التقدم النهائي τf والتمييز بين xf و xmax", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u4_3", "title": "عمل مخبري: قياس pH محاليل مختلفة لحموض وأسس وحساب نسبة التقدم النهائي τf", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u4_4", "title": "مفهوم حالة التوازن الكيميائي، كسر التفاعل Qr، وثابت التوازن K للتفاعل", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u4_5", "title": "الجداء الشاردي للماء Ke، ومفهوم المحاليل الحمضية والمعتدلة والأساسية عند 25°C", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u4_6", "title": "ثابت الحموضة Ka للثنائية (أساس/حمض) ومخطط توزيع الصفة الغالبة وعلاقة pH = pKa + log([A-]/[HA])", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u4_7", "title": "عمل مخبري: المعايرة الـ pH-مترية لحمض قوي بأساس قوي ولحمض ضعيف بأساس قوي", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u4_8", "title": "دراسة منحنيات المعايرة pH = f(Vb): نقطة التكافؤ، نصف التكافؤ، واختيار الكاشف الملون المناسب", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u4_9", "title": "المحلول المنظم (الموقي): تعريفه، خصائصه، وأهميته الحيوية والصناعية", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u4_10", "title": "أعمال موجهة: حل مسائل المعايرة وحساب الثوابت K و Ka ونسب التقدم النهائي", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      },
-      {
-        "id": "3as_se_u5",
-        "number": 5,
-        "title": "05: التحولات النووية",
-        "hours": "06 سا + 04 أ م",
-        "items": [
-          {"id": "3as_se_u5_1", "title": "بنية النواة، النظائر، القوى النووية القوية، ومخطط سيغري (N, Z) ومناطق الاستقرار النووي", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u5_2", "title": "النشاط الإشعاعي الطبيعي وأنماطه: التفككات α، β-، β+، والإصدار الكهرومغناطيسي γ وقانونا سودي", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u5_3", "title": "قانون التناقص الإشعاعي N(t) = N0 e^(-λt)، ثابت النشاط الإشعاعي λ، وزمن نصف العمر t1/2", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u5_4", "title": "النشاط الإشعاعي لعينة A(t) وتطبيقات التأريخ بالنشاط الإشعاعي (الكربون 14، البوتاسيوم-أرغون)", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u5_5", "title": "النقص في الكتلة Δm وطاقة الربط النووية El، وطاقة الربط لكل نوية El/A ومنحنى أستون", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u5_6", "title": "التفاعلات النووية المفتعلة: الانشطار النووي والاندماج النووي، شروطهما ومعادلاتهما", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u5_7", "title": "الحصيلة الكتلية والطاقوية لتفاعل نووي: الطاقة المحررة Elib = |Δm|.c² والمردود الطاقوي", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u5_8", "title": "أعمال موجهة: حل مسائل التناقص الإشعاعي، طاقة الربط، وتطبيقات المفاعلات النووية", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      },
-      {
-        "id": "3as_se_u6",
-        "number": 6,
-        "title": "06: مراقبة تطور جملة كيميائية",
-        "hours": "08 سا + 03 أ م",
-        "items": [
-          {"id": "3as_se_u6_1", "title": "مقارنة كسر التفاعل في الحالة الابتدائية Qr,i مع ثابت التوازن K وتوقع جهة التطور التلقائي للجملة", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u6_2", "title": "الأعمدة الكهروكيميائية: مبدأ اشتغال عمود دانيال، القطب الموجب، القطب السالب، وجسر الملح", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u6_3", "title": "عمل مخبري: تركيب ودراسة عمود كهروكيميائي وتعيين القوة المحركة الكهربائية والتطور التلقائي", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u6_4", "title": "كمية الكهرباء Q المنتجة بواسطة عمود، ثابت فراداي F، ومدة اشتغال العمود Δt", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u6_5", "title": "تفاعلات الأسترة وإماهة الإستر: الصيغ المفصلة للكحولات، الحموض الكربوكسيلية، والإسترات وتسميتها", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u6_6", "title": "عمل مخبري: تصنيع إستر (الأسترة)، التقطير المرتد، وحساب المردود r", "type": "عمل مخبري", "hours": "2 سا"},
-          {"id": "3as_se_u6_7", "title": "خصائص تفاعل الأسترة: بطيء، عكوس، ولا حراري، وتأثير صنف الكحول على مردود الأسترة", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u6_8", "title": "طرق تحسين مردود وسرعة الأسترة: إضافة وسيط حمضي، التسخين، استعمال شوارد متفاعلة بزيادة، أو إزالة أحد النواتج", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u6_9", "title": "التصبن: التفاعل بين إستر وأساس قوي، تصنيع الصابون، والتحكم في التطور القسري للجملة", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u6_10", "title": "أعمال موجهة: حل مسائل حول الأعمدة ومردود الأسترة ومراقبة التحول الكيميائي", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      },
-      {
-        "id": "3as_se_u7",
-        "number": 7,
-        "title": "07: التطورات المهتزة",
-        "hours": "06 سا + 02 أ م",
-        "items": [
-          {"id": "3as_se_u7_1", "title": "الاهتزازات الميكانيكية الحرة غير المخامدة: النواس المرن (جسم صلب - نابض)، قوة الارتداد", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u7_2", "title": "المعادلة التفاضلية للاهتزازات الحرة للنواس المرن الأفقي، حلها، والدور الذاتي T0 = 2π √(m/k)", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u7_3", "title": "الدراسة الطاقوية للنواس المرن: الطاقة الحركية، الطاقة الكامنة المرونية، وانحفاظ الطاقة الميكانيكية", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u7_4", "title": "الاهتزازات الميكانيكية المخامدة: أنماط التخامد (شبه دوري، لا دوري، وحرج) وتناقص الطاقة الميكانيكية", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u7_5", "title": "الاهتزازات الكهربائية الحرة في دارة LC المثالية: المعادلة التفاضلية للتوتر والشحنة والدور الذاتي T0 = 2π √(LC)", "type": "درس نظري", "hours": "2 سا"},
-          {"id": "3as_se_u7_6", "title": "التبادل الطاقوي بين المكثفة والوشيعة في الدارة LC ودارة RLC وظاهرة التخامد الكهربائي", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u7_7", "title": "التماثل بين المقادير الميكانيكية والكهربائية في الجمل المهتزة", "type": "درس نظري", "hours": "1 سا"},
-          {"id": "3as_se_u7_8", "title": "أعمال موجهة: حل تمارين حول النواس المرن والدارات المهتزة RLC ومطابقة المنحنيات البيانية", "type": "أعمال موجهة", "hours": "2 سا"}
-        ]
-      }
-    ]
-  }
+PDF_CONFIGS = [
+    {
+        'file': '3-01-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['3as_se'],
+        'level': '3as',
+        'desc': '3 علوم تجريبية'
+    },
+    {
+        'file': '3-02-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['3as_m', '3as_tm'],
+        'level': '3as',
+        'desc': '3 رياضيات وتقني رياضي'
+    },
+    {
+        'file': '2-01-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['2as_se'],
+        'level': '2as',
+        'desc': '2 علوم تجريبية'
+    },
+    {
+        'file': '2-02-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['2as_m', '2as_tm'],
+        'level': '2as',
+        'desc': '2 رياضيات وتقني رياضي'
+    },
+    {
+        'file': '2-03-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['2as_lph'],
+        'level': '2as',
+        'desc': '2 آداب وفلسفة'
+    },
+    {
+        'file': '1-01-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['1as_tc_st'],
+        'level': '1as',
+        'desc': '1 ج م علوم وتكنولوجيا'
+    },
+    {
+        'file': '1-02-A - آلية تنفيد التدرجات السنوية.PDF',
+        'streams': ['1as_tc_l'],
+        'level': '1as',
+        'desc': '1 ج م آداب'
+    }
+]
+
+STREAM_METADATA = {
+    '3as_se': {'name': '3 علوم تجريبية', 'code': '3 ع ت'},
+    '3as_m': {'name': '3 رياضيات', 'code': '3 ر'},
+    '3as_tm': {'name': '3 تقني رياضي', 'code': '3 ت ر'},
+    '2as_se': {'name': '2 علوم تجريبية', 'code': '2 ع ت'},
+    '2as_m': {'name': '2 رياضيات', 'code': '2 ر'},
+    '2as_tm': {'name': '2 تقني رياضي', 'code': '2 ت ر'},
+    '2as_lph': {'name': '2 آداب وفلسفة', 'code': '2 آف'},
+    '1as_tc_st': {'name': '1 ج م علوم وتكنولوجيا', 'code': '1 ج م ع ت'},
+    '1as_tc_l': {'name': '1 ج م آداب', 'code': '1 ج م آ'}
 }
 
-print("Loaded base schema.")
+def clean_arabic(text):
+    text = re.sub(r'[\u200e\u200f\u202a-\u202e]', '', text)
+    # Fix broken arabic glyphs or extra spaces
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
+def get_vlines(page):
+    stream = page.get_contents()
+    if isinstance(stream, list):
+        data = ''.join(s.get_data().decode('latin1', errors='ignore') for s in stream)
+    else:
+        data = stream.get_data().decode('latin1', errors='ignore')
+    tokens = data.split()
+    v_lines = []
+    for i in range(len(tokens)):
+        if tokens[i] == 're' and i >= 4:
+            try:
+                x = float(tokens[i-4])
+                w = float(tokens[i-2])
+                h = float(tokens[i-1])
+                if w < 2.5 and h > 35:
+                    v_lines.append(x)
+            except: pass
+        elif tokens[i] == 'l' and i >= 3 and tokens[i-3] == 'm':
+            try:
+                x1 = float(tokens[i-5])
+                x2 = float(tokens[i-2])
+                y1 = float(tokens[i-4])
+                y2 = float(tokens[i-1])
+                if abs(x1 - x2) < 2.5 and abs(y1 - y2) > 35:
+                    v_lines.append(x1)
+            except: pass
+    return sorted(set(round(x, 1) for x in v_lines))
+
+def get_page_chunks(page):
+    chunks = []
+    def visitor(text, cm, tm, font_dict, font_size):
+        t = text.strip()
+        if t:
+            chunks.append({'text': t, 'x': tm[4], 'y': tm[5], 'fs': font_size})
+    page.extract_text(visitor_text=visitor)
+    return chunks
+
+def classify_type(title):
+    t = title.lower()
+    if any(k in t for k in ['عمل مخبري', 'مخبر', 'تجربة', 'محاكاة', 'ع م', 'ع.م', 'قياس', 'معايرة', 'راسم الاهتزاز', 'تحقيق تجارب', 'شحن وتفريغ']):
+        return 'عمل مخبري'
+    elif any(k in t for k in ['أعمال موجهة', 'تمارين', 'تمرين', 'حل مسائل', 'مسائل', 'تطبيقات', 'أ.م', 'أ م']):
+        return 'أعمال موجهة'
+    else:
+        return 'درس نظري'
+
+def is_continuation_line(line, prev_line):
+    if not prev_line:
+        return False
+    # If starts with bullet or number, not a continuation
+    if re.match(r'^[\-•\*—–\+\d\.]', line):
+        return False
+    # Specific continuation starters (conjunctions, single nouns, prepositions)
+    first_word = line.split()[0] if line.split() else ''
+    if first_word in ['و', 'في', 'من', 'إلى', 'على', 'عن', 'مع', 'أو', 'أن', 'أنها', 'بواسطة', 'حيث', 'عند', 'بين', 'التي', 'الذي', 'التي', 'مختلفة', 'وشيعة', 'الكهربائي', 'والتفريغ', 'للتحويل', 'للمتابعة', 'لنيوتن', 'للكفاءة']:
+        return True
+    if len(line.split()) <= 2 and not any(k in line for k in ['مفهوم', 'التعرف', 'دراسة', 'الطاقة']):
+        return True
+    return False
+
+def clean_item_title(text):
+    text = clean_arabic(text)
+    # Remove leading bullets or dashes
+    text = re.sub(r'^[\s\-•\*—–\+\:\.\d\(\)]+', '', text).strip()
+    # Remove trailing dashes or colons if dangling
+    text = re.sub(r'[\s\-•\*—–\+]+$', '', text).strip()
+    return text
+
+def parse_pdf_to_units(pdf_path):
+    reader = pypdf.PdfReader(pdf_path)
+    total_pages = len(reader.pages)
+    
+    # 1. Detect unit headers
+    unit_headers = []
+    for p_idx in range(2, total_pages):
+        page = reader.pages[p_idx]
+        chunks = get_page_chunks(page)
+        u_chunks = [c for c in chunks if 'الوحدة' in c['text']]
+        for uc in u_chunks:
+            y = uc['y']
+            row = [c for c in chunks if abs(c['y'] - y) < 8]
+            row.sort(key=lambda c: -c['x'])
+            line = ' '.join(c['text'] for c in row)
+            line_cl = clean_arabic(line)
+            if any(k in line_cl for k in ['الوحدة رقم', 'الوحدة 1', 'الوحدة 2', 'الوحدة 3', 'الوحدة 4', 'الوحدة 5', 'الوحدة 6', 'الوحدة 7', 'الوحدة 8', 'الوحدة 9', 'الوحدة 10', 'الوحدة الأولى', 'الوحدة الثانية', 'الوحدة الثالثة']) or (line_cl.startswith('الوحدة') and ('سا' in line_cl or 'أ م' in line_cl or 'أ. م' in line_cl)):
+                if not any(bad in line_cl for bad in ['تقويم الوحدة', 'في الوحدة', 'تناول جزء', 'أضعاف']):
+                    if not any(uh['p_idx'] == p_idx and abs(uh['y'] - y) < 15 for uh in unit_headers):
+                        unit_headers.append({
+                            'p_idx': p_idx,
+                            'y': y,
+                            'title': line_cl
+                        })
+
+    unit_headers.sort(key=lambda u: (u['p_idx'], -u['y']))
+    
+    # 2. Extract column items for each unit
+    units = []
+    for idx, uh in enumerate(unit_headers):
+        start_p = uh['p_idx']
+        start_y = uh['y']
+        if idx + 1 < len(unit_headers):
+            end_p = unit_headers[idx + 1]['p_idx']
+            end_y = unit_headers[idx + 1]['y']
+        else:
+            end_p = total_pages - 1
+            end_y = 50.0
+            
+        unit_num = idx + 1
+        
+        # Find column boundaries
+        curr_bounds = None
+        for p in range(start_p, min(start_p + 2, total_pages)):
+            page = reader.pages[p]
+            chunks = get_page_chunks(page)
+            s_hdr = [c for c in chunks if 'السير المنهجي' in c['text']]
+            v_lines = get_vlines(page)
+            if s_hdr and len(v_lines) >= 6:
+                x_h = s_hdr[0]['x']
+                lefts = [v for v in v_lines if v < x_h - 10]
+                rights = [v for v in v_lines if v > x_h + 10]
+                if lefts and rights:
+                    curr_bounds = (max(lefts), min(rights))
+                    break
+        if not curr_bounds:
+            curr_bounds = (250.0, 480.0)
+            
+        raw_lines = []
+        for p in range(start_p, end_p + 1):
+            page = reader.pages[p]
+            chunks = get_page_chunks(page)
+            v_lines = get_vlines(page)
+            s_hdr = [c for c in chunks if 'السير المنهجي' in c['text']]
+            if s_hdr and len(v_lines) >= 6:
+                x_h = s_hdr[0]['x']
+                lefts = [v for v in v_lines if v < x_h - 10]
+                rights = [v for v in v_lines if v > x_h + 10]
+                if lefts and rights:
+                    curr_bounds = (max(lefts), min(rights))
+                    
+            y_top = 560.0
+            y_bot = 60.0
+            if p == start_p:
+                if s_hdr and s_hdr[0]['y'] < start_y:
+                    y_top = s_hdr[0]['y'] - 5
+                else:
+                    y_top = start_y - 25
+            elif s_hdr:
+                y_top = s_hdr[0]['y'] - 5
+            if p == end_p:
+                y_bot = end_y + 10
+                
+            col_chunks = [c for c in chunks if curr_bounds[0] + 2 <= c['x'] <= curr_bounds[1] - 2 and y_bot <= c['y'] <= y_top]
+            col_chunks.sort(key=lambda c: -c['y'])
+            
+            cur_y = None
+            cur_p = []
+            for c in col_chunks:
+                if cur_y is None or abs(c['y'] - cur_y) < 4:
+                    cur_p.append(c)
+                    cur_y = c['y']
+                else:
+                    cur_p.sort(key=lambda x: -x['x'])
+                    raw_lines.append(' '.join(p['text'] for p in cur_p))
+                    cur_p = [c]
+                    cur_y = c['y']
+            if cur_p:
+                cur_p.sort(key=lambda x: -x['x'])
+                raw_lines.append(' '.join(p['text'] for p in cur_p))
+
+        # Join wrapped lines, keep distinct lines as separate items
+        unit_items = []
+        prev_line = ""
+        for line in raw_lines:
+            line_cl = clean_arabic(line)
+            if not line_cl or any(h in line_cl for h in ['السير المنهجي لتدرج التعلمات', 'وزارة التربية الوطنية', 'التدرجات السنوية']):
+                continue
+            if line_cl.startswith('الوحدة رقم'):
+                continue
+            if line_cl in ['تقويم', 'تقويم مرحلي', 'تقويم الوحدة', 'التعلمات']:
+                continue
+                
+            # If continuation of previous line
+            if is_continuation_line(line_cl, prev_line):
+                if unit_items:
+                    unit_items[-1] = clean_item_title(unit_items[-1] + ' ' + line_cl)
+                else:
+                    unit_items.append(clean_item_title(line_cl))
+            else:
+                cleaned = clean_item_title(line_cl)
+                if cleaned and len(cleaned) > 2:
+                    unit_items.append(cleaned)
+            prev_line = line_cl
+
+        # Format clean unit title
+        raw_u_title = uh['title']
+        raw_u_title = re.sub(r'^.*?الوحدة\s*(رقم)?\s*\d*\s*[\:\(]?', '', raw_u_title)
+        raw_u_title = re.sub(r'\(\s*\d+.*?\)', '', raw_u_title)
+        raw_u_title = re.sub(r'\d+\s*\+\s*سا.*$', '', raw_u_title)
+        raw_u_title = re.sub(r'[\(\)\:\.\+]', '', raw_u_title).strip()
+        raw_u_title = re.sub(r'^\d+\s*', '', raw_u_title).strip()
+        if not raw_u_title:
+            raw_u_title = f"الوحدة {unit_num}"
+        formatted_title = f"{unit_num:02d}: {raw_u_title}"
+        
+        units.append({
+            'id': f"u{unit_num}",
+            'number': unit_num,
+            'title': formatted_title,
+            'raw_items': unit_items
+        })
+        
+    return units
+
+def build_full_syllabus():
+    full_data = {}
+    
+    for cfg in PDF_CONFIGS:
+        print(f"\nProcessing {cfg['file']} -> {cfg['streams']}...")
+        units = parse_pdf_to_units(cfg['file'])
+        
+        for stream_id in cfg['streams']:
+            meta = STREAM_METADATA.get(stream_id, {'name': stream_id, 'code': stream_id})
+            stream_units = []
+            
+            for u in units:
+                u_id = f"{stream_id}_{u['id']}"
+                items = []
+                for idx, raw_it in enumerate(u['raw_items']):
+                    it_id = f"{u_id}_{idx+1}"
+                    it_type = classify_type(raw_it)
+                    items.append({
+                        'id': it_id,
+                        'title': raw_it,
+                        'type': it_type
+                    })
+                stream_units.append({
+                    'id': u_id,
+                    'number': u['number'],
+                    'title': u['title'],
+                    'items': items
+                })
+                
+            full_data[stream_id] = {
+                'streamId': stream_id,
+                'streamName': meta['name'],
+                'code': meta['code'],
+                'units': stream_units
+            }
+            total_it = sum(len(u['items']) for u in stream_units)
+            print(f"  -> Generated {stream_id}: {len(stream_units)} units, {total_it} total items")
+
+    # Also generate aliases for combinations if needed (e.g. 3as_tm_m, 2as_tm_m)
+    if '3as_tm' in full_data and '3as_tm_m' not in full_data:
+        full_data['3as_tm_m'] = full_data['3as_tm']
+    if '2as_tm' in full_data and '2as_tm_m' not in full_data:
+        full_data['2as_tm_m'] = full_data['2as_tm']
+
+    return full_data
+
+if __name__ == '__main__':
+    syllabus = build_full_syllabus()
+    
+    # Save as JSON for backend and frontend
+    out_json = 'data/syllabus_default.json'
+    with open(out_json, 'w', encoding='utf-8') as f:
+        json.dump(syllabus, f, ensure_ascii=False, indent=2)
+    print(f"\nWrote full syllabus to {out_json}")
+    
+    # Also write to src/data/syllabusData.js
+    out_js = 'src/data/syllabusData.js'
+    js_content = "// الدليل المنهجي للتعلمات ومحتويات دفتر النصوص الرسمية لمادة العلوم الفيزيائية\n"
+    js_content += "// مستخرجة سطراً بسطر من عمود 'السير المنهجي لتدرج التعلمات' لآليات تنفيذ التدرجات السنوية الرسمية\n\n"
+    js_content += "export const SYLLABUS_DATA = " + json.dumps(syllabus, ensure_ascii=False, indent=2) + ";\n"
+    with open(out_js, 'w', encoding='utf-8') as f:
+        f.write(js_content)
+    print(f"Wrote full syllabus to {out_js}")
