@@ -197,90 +197,98 @@ export default function DocumentsTab({ config }) {
           )}
         </div>
 
-        {/* Filter Chips / Selectors */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-1 border-t border-slate-100">
+        {/* Filter Chips / Selectors - Responsive Grid on Mobile, Clean Flex on Desktop */}
+        <div className="space-y-3 pt-2 border-t border-slate-100">
           {/* Level Filter */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
-            <span className="text-xs font-bold text-slate-400 shrink-0 ml-1">المستوى:</span>
-            {[
-              { id: 'all', label: 'الكل' },
-              { id: '1as', label: '1 ثانوي (1AS)' },
-              { id: '2as', label: '2 ثانوي (2AS)' },
-              { id: '3as', label: '3 ثانوي (3AS)' }
-            ].map((lvl) => (
-              <button
-                key={lvl.id}
-                onClick={() => {
-                  setSelectedLevel(lvl.id);
-                  setSelectedStream('all');
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
-                  selectedLevel === lvl.id
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {lvl.label}
-              </button>
-            ))}
+          <div className="space-y-1.5 sm:space-y-0 sm:flex sm:items-center sm:gap-2">
+            <span className="text-xs font-bold text-slate-500 shrink-0 block sm:inline">تصفية حسب المستوى:</span>
+            <div className="grid grid-cols-4 gap-1.5 sm:flex sm:items-center sm:gap-1.5 w-full sm:w-auto">
+              {[
+                { id: 'all', label: 'الكل' },
+                { id: '1as', label: '1 ثانوي' },
+                { id: '2as', label: '2 ثانوي' },
+                { id: '3as', label: '3 ثانوي' }
+              ].map((lvl) => (
+                <button
+                  key={lvl.id}
+                  onClick={() => {
+                    setSelectedLevel(lvl.id);
+                    setSelectedStream('all');
+                  }}
+                  className={`text-center py-2 px-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    selectedLevel === lvl.id
+                      ? 'bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-700/20'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {lvl.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Category Filter */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
-            <span className="text-xs font-bold text-slate-400 shrink-0 ml-1">النوع:</span>
-            {[
-              { id: 'all', label: 'جميع الأنواع' },
-              { id: 'progression', label: 'التدرجات السنوية' },
-              { id: 'curriculum', label: 'المناهج الرسمية' },
-              { id: 'accompanying', label: 'الوثائق المرافقة' },
-              { id: 'guide', label: 'أدلة الأستاذ' }
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
-                  selectedCategory === cat.id
-                    ? 'bg-slate-800 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Stream Filter (Optional fine-grained selection) */}
-        {selectedLevel !== 'all' && (
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 overflow-x-auto scrollbar-none">
-            <span className="text-xs font-semibold text-slate-500 shrink-0">الشعبة المحددة:</span>
-            <button
-              onClick={() => setSelectedStream('all')}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
-                selectedStream === 'all'
-                  ? 'bg-indigo-100 text-indigo-700 font-bold'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              جميع شعب هذا المستوى
-            </button>
-            {availableStreams
-              .filter((s) => s.level === selectedLevel)
-              .map((s) => (
+          <div className="space-y-1.5 sm:space-y-0 sm:flex sm:items-center sm:gap-2 pt-1 border-t border-slate-100">
+            <span className="text-xs font-bold text-slate-500 shrink-0 block sm:inline">نوع الوثيقة:</span>
+            <div className="grid grid-cols-2 sm:flex sm:items-center sm:flex-wrap gap-1.5 w-full sm:w-auto">
+              {[
+                { id: 'all', label: 'جميع الأنواع', fullWidthMobile: true },
+                { id: 'progression', label: 'التدرجات السنوية' },
+                { id: 'curriculum', label: 'المناهج الرسمية' },
+                { id: 'accompanying', label: 'الوثائق المرافقة' },
+                { id: 'guide', label: 'أدلة الأستاذ' }
+              ].map((cat) => (
                 <button
-                  key={s.stream}
-                  onClick={() => setSelectedStream(s.stream)}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all shrink-0 ${
-                    selectedStream === s.stream
-                      ? 'bg-indigo-100 text-indigo-700 font-bold'
-                      : 'text-slate-600 hover:bg-slate-100'
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`${
+                    cat.fullWidthMobile ? 'col-span-2 sm:col-span-1' : ''
+                  } text-center py-2 px-2.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    selectedCategory === cat.id
+                      ? 'bg-slate-800 text-white shadow-sm ring-1 ring-slate-900/30'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  {s.streamName}
+                  {cat.label}
                 </button>
               ))}
+            </div>
           </div>
-        )}
+
+          {/* Stream Filter (Optional fine-grained selection) */}
+          {selectedLevel !== 'all' && (
+            <div className="space-y-1.5 sm:space-y-0 sm:flex sm:items-center sm:gap-2 pt-1.5 border-t border-slate-100">
+              <span className="text-xs font-semibold text-slate-500 shrink-0 block sm:inline">الشعبة المحددة:</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button
+                  onClick={() => setSelectedStream('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                    selectedStream === 'all'
+                      ? 'bg-indigo-100 text-indigo-700 font-bold border border-indigo-200 shadow-xs'
+                      : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
+                  }`}
+                >
+                  جميع شعب هذا المستوى
+                </button>
+                {availableStreams
+                  .filter((s) => s.level === selectedLevel)
+                  .map((s) => (
+                    <button
+                      key={s.stream}
+                      onClick={() => setSelectedStream(s.stream)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                        selectedStream === s.stream
+                          ? 'bg-indigo-100 text-indigo-700 font-bold border border-indigo-200 shadow-xs'
+                          : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
+                      }`}
+                    >
+                      {s.streamName}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Results Header */}

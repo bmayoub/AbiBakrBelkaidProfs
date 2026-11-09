@@ -86,3 +86,4 @@ export default function MobileBottomNav({ activeTab, setActiveTab, currentRole }
     </nav>
   );
 }
+

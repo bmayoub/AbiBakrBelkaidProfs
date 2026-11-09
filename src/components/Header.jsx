@@ -83,30 +83,6 @@ export default function Header({
               </button>
             )}
 
-            {/* Print Teachers Credentials / Passcodes Sheet (Coordinator Only) */}
-            {currentRole === 'coordinator' && (
-              <button
-                onClick={onOpenTeacherCredentials}
-                title="طباعة ورقة أسماء الأساتذة وكلمات مرورهم لتوزيعها أو تصويرها"
-                className="p-2 sm:px-3 sm:py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer min-h-[36px]"
-              >
-                <KeyRound className="w-4 h-4 text-blue-600" />
-                <span className="hidden md:inline">كلمات مرور الأساتذة</span>
-              </button>
-            )}
-
-            {/* Print Curriculum Progress Report (Coordinator Only) */}
-            {currentRole === 'coordinator' && (
-              <button
-                onClick={onOpenReport}
-                title="طباعة تقرير تقدم المنهاج والتوزيع السنوي"
-                className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer min-h-[36px]"
-              >
-                <Printer className="w-4 h-4 text-slate-600" />
-                <span className="hidden md:inline">تقرير تقدم المنهاج</span>
-              </button>
-            )}
-
             {/* Logout/Switch Button */}
             <button
               onClick={onLogout}
