@@ -249,57 +249,60 @@ export default function CoordinatorAdminTab({
 
   return (
     <div className="space-y-6">
-      {/* Admin Navigation Pills */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-2 shadow-xs flex items-center gap-2 overflow-x-auto">
+      {/* Admin Navigation Pills - Responsive 2x2 Grid on Mobile, Flex Row on Desktop */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-2 shadow-xs grid grid-cols-2 md:flex md:items-center gap-1.5 md:gap-2">
         <button
           onClick={() => setActiveAdminSubTab('teachers')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center justify-center md:justify-start gap-1.5 md:gap-2 px-3 md:px-5 py-2.5 rounded-xl text-xs font-bold transition-all text-center md:text-right ${
             activeAdminSubTab === 'teachers'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-blue-600 text-white shadow-xs ring-1 ring-blue-700/20'
+              : 'text-slate-600 bg-slate-50 hover:bg-slate-100 md:bg-transparent md:hover:bg-slate-100 border border-slate-200/60 md:border-0'
           }`}
         >
-          <Users className="w-4 h-4" />
-          <span>إدارة الأساتذة وكلمات المرور</span>
+          <Users className="w-4 h-4 shrink-0" />
+          <span className="truncate">إدارة الأساتذة</span>
+          <span className="hidden lg:inline">وكلمات المرور</span>
         </button>
 
         <button
           onClick={() => setActiveAdminSubTab('classes')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center justify-center md:justify-start gap-1.5 md:gap-2 px-3 md:px-5 py-2.5 rounded-xl text-xs font-bold transition-all text-center md:text-right ${
             activeAdminSubTab === 'classes'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-blue-600 text-white shadow-xs ring-1 ring-blue-700/20'
+              : 'text-slate-600 bg-slate-50 hover:bg-slate-100 md:bg-transparent md:hover:bg-slate-100 border border-slate-200/60 md:border-0'
           }`}
         >
-          <Layers className="w-4 h-4" />
-          <span>إدارة الأقسام وتوزيع الإسناد</span>
+          <Layers className="w-4 h-4 shrink-0" />
+          <span className="truncate">إدارة الأقسام</span>
+          <span className="hidden lg:inline">وتوزيع الإسناد</span>
         </button>
 
         <button
           onClick={() => setActiveAdminSubTab('settings')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center justify-center md:justify-start gap-1.5 md:gap-2 px-3 md:px-5 py-2.5 rounded-xl text-xs font-bold transition-all text-center md:text-right ${
             activeAdminSubTab === 'settings'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-blue-600 text-white shadow-xs ring-1 ring-blue-700/20'
+              : 'text-slate-600 bg-slate-50 hover:bg-slate-100 md:bg-transparent md:hover:bg-slate-100 border border-slate-200/60 md:border-0'
           }`}
         >
-          <School className="w-4 h-4" />
-          <span>إعدادات المؤسسة وحماية الموقع</span>
+          <School className="w-4 h-4 shrink-0" />
+          <span className="truncate">إعدادات المؤسسة</span>
+          <span className="hidden lg:inline">وحماية الموقع</span>
         </button>
 
         <button
           onClick={() => setActiveAdminSubTab('archive')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center justify-center md:justify-start gap-1.5 md:gap-2 px-3 md:px-5 py-2.5 rounded-xl text-xs font-bold transition-all text-center md:text-right ${
             activeAdminSubTab === 'archive'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-blue-600 text-white shadow-xs ring-1 ring-blue-700/20'
+              : 'text-slate-600 bg-slate-50 hover:bg-slate-100 md:bg-transparent md:hover:bg-slate-100 border border-slate-200/60 md:border-0'
           }`}
         >
-          <Archive className="w-4 h-4" />
-          <span>أرشفة وبدء سنة جديدة</span>
+          <Archive className="w-4 h-4 shrink-0" />
+          <span className="truncate">أرشفة وسنة جديدة</span>
           {archives.length > 0 && (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-              activeAdminSubTab === 'archive' ? 'bg-white text-blue-700' : 'bg-blue-50 text-blue-700'
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black shrink-0 ${
+              activeAdminSubTab === 'archive' ? 'bg-white text-blue-700' : 'bg-blue-100 text-blue-700'
             }`}>
               {archives.length}
             </span>
