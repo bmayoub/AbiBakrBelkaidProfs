@@ -74,3 +74,4 @@ js_content += "export const DOCUMENTS_DATA = " + json.dumps(docs, ensure_ascii=F
 with open('src/data/documentsData.js', 'w', encoding='utf-8') as f:
     f.write(js_content)
 print("Saved src/data/documentsData.js successfully!")
+

@@ -7,6 +7,7 @@ import CurriculumProgressTab from './components/CurriculumProgressTab';
 import LogbookTab from './components/LogbookTab';
 import DocumentsTab from './components/DocumentsTab';
 import CoordinatorAdminTab from './components/CoordinatorAdminTab';
+import MobileBottomNav from './components/MobileBottomNav';
 import ReportPrintModal from './components/ReportPrintModal';
 import ChangePinModal from './components/ChangePinModal';
 import TeacherCredentialsPrintModal from './components/TeacherCredentialsPrintModal';
@@ -581,12 +582,19 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 no-print">
+      <footer className="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 mb-14 sm:mb-0 no-print">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <span>منصة التنسيق البيداغوجي لمادة العلوم الفيزيائية • {config?.schoolName || 'ثانوية أبي بكر بلقايد - النزلة'}</span>
           <span className="font-mono text-slate-400">السنة الدراسية: {config?.academicYear || '2026/2027'}</span>
         </div>
       </footer>
+
+      {/* Mobile Sticky Bottom Navigation */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        currentRole={currentRole}
+      />
 
       {/* Role / Login Modal */}
       <RoleSelectModal

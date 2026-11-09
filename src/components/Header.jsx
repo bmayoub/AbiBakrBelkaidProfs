@@ -119,69 +119,70 @@ export default function Header({
           </div>
         </div>
 
-        {/* Navigation Tabs (Mobile Horizontal Touch Scroll) */}
-        <div className="-mx-3 px-3 sm:mx-0 sm:px-0 flex items-center gap-1.5 sm:gap-2 border-t border-slate-100 py-2 overflow-x-auto scrollbar-none touch-pan-x">
+        {/* Navigation Tabs - Responsive 2x2 Grid on Mobile, Clean Flex Row on Desktop */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-2 border-t border-slate-100 py-2 sm:py-2.5">
           <button
             onClick={() => setActiveTab('progress')}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center sm:text-right ${
               activeTab === 'progress'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-700/20'
+                : 'text-slate-600 bg-slate-50 hover:bg-slate-100 sm:bg-transparent sm:hover:bg-slate-100 border border-slate-200/70 sm:border-0'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>1- التقدم في الدروس</span>
-            <span className="hidden sm:inline">والتوزيع السنوي</span>
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">1- التقدم في الدروس</span>
+            <span className="hidden lg:inline">والتوزيع السنوي</span>
           </button>
 
           <button
             onClick={() => setActiveTab('logbook')}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center sm:text-right ${
               activeTab === 'logbook'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-700/20'
+                : 'text-slate-600 bg-slate-50 hover:bg-slate-100 sm:bg-transparent sm:hover:bg-slate-100 border border-slate-200/70 sm:border-0'
             }`}
           >
-            <BookMarked className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>2- دفتر النصوص</span>
+            <BookMarked className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">2- دفتر النصوص</span>
           </button>
 
           <button
             onClick={() => setActiveTab('coordination')}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center sm:text-right ${
               activeTab === 'coordination'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-700/20'
+                : 'text-slate-600 bg-slate-50 hover:bg-slate-100 sm:bg-transparent sm:hover:bg-slate-100 border border-slate-200/70 sm:border-0'
             }`}
           >
-            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>3- تنسيق الفروض</span>
-            <span className="hidden sm:inline">والاختبارات</span>
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">3- تنسيق الفروض</span>
+            <span className="hidden lg:inline">والاختبارات</span>
           </button>
 
           <button
             onClick={() => setActiveTab('documents')}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center sm:text-right ${
               activeTab === 'documents'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-purple-600 text-white shadow-sm ring-1 ring-purple-700/20'
+                : 'text-slate-600 bg-slate-50 hover:bg-slate-100 sm:bg-transparent sm:hover:bg-slate-100 border border-slate-200/70 sm:border-0'
             }`}
           >
-            <FolderDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>4- مكتبة الوثائق والتحميل</span>
+            <FolderDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">4- مكتبة الوثائق</span>
+            <span className="hidden lg:inline">والتحميل</span>
           </button>
 
           {currentRole === 'coordinator' && (
             <button
               onClick={() => setActiveTab('admin')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              className={`col-span-2 sm:col-span-1 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-center sm:text-right ${
                 activeTab === 'admin'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-700/20'
+                  : 'text-slate-600 bg-slate-50 hover:bg-slate-100 sm:bg-transparent sm:hover:bg-slate-100 border border-slate-200/70 sm:border-0'
               }`}
             >
-              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>لوحة تحكم المنسق</span>
+              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span>5- لوحة تحكم المنسق</span>
             </button>
           )}
         </div>
