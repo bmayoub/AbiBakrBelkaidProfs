@@ -353,6 +353,19 @@ export async function resetSyllabus(streamId) {
   return await res.json();
 }
 
+// --- DOCUMENTS (المكتبة والوثائق التربوية) ---
+export async function fetchDocuments() {
+  try {
+    const res = await fetch(`${API_BASE}/documents`);
+    if (!res.ok) throw new Error('Failed to fetch documents');
+    return await res.json();
+  } catch (err) {
+    console.warn('API error fetching documents:', err);
+    return null;
+  }
+}
+
+
 
 
 

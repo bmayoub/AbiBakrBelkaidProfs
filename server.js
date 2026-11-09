@@ -1042,6 +1042,35 @@ app.post('/api/syllabus/:streamId/reset', (req, res) => {
   res.json({ success: true, syllabus: db.syllabus[streamId], allSyllabus: db.syllabus });
 });
 
+// --- OFFICIAL DOCUMENTS & DOWNLOAD ROUTES ---
+const DOCS_DIR = path.join(__dirname, 'documents');
+
+app.get('/api/documents', (req, res) => {
+  const metaPath = path.join(__dirname, 'data', 'documents.json');
+  if (fs.existsSync(metaPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+      return res.json(data);
+    } catch (e) {
+      console.error('Error reading documents.json:', e);
+    }
+  }
+  res.json([]);
+});
+
+// Direct file preview/viewing
+app.use('/api/documents/file', express.static(DOCS_DIR));
+
+// Direct attachment download
+app.get('/api/documents/download/:filename', (req, res) => {
+  const { filename } = req.params;
+  const filePath = path.join(DOCS_DIR, filename);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('الملف غير موجود');
+  }
+  res.download(filePath, filename);
+});
+
 // --- ARCHIVE & NEW ACADEMIC YEAR ROUTES ---
 app.get('/api/archives', (req, res) => {
   const db = readDb();

@@ -130,3 +130,4 @@ def process_pdf(pdf_path):
 if __name__ == '__main__':
     for pdf in sorted(PDF_MAP.keys()):
         process_pdf(pdf)
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Atom, User, Shield, LogOut, FileText, BarChart2, Calendar, BookOpen, BookMarked, Printer, KeyRound } from 'lucide-react';
+import { Atom, User, Shield, LogOut, FileText, BarChart2, Calendar, BookOpen, BookMarked, Printer, KeyRound, FolderDown } from 'lucide-react';
 
 export default function Header({
   currentUser,
@@ -157,6 +157,18 @@ export default function Header({
             <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>3- تنسيق الفروض</span>
             <span className="hidden sm:inline">والاختبارات</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('documents')}
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              activeTab === 'documents'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <FolderDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>4- مكتبة الوثائق والتحميل</span>
           </button>
 
           {currentRole === 'coordinator' && (

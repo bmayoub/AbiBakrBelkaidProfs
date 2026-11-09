@@ -5,6 +5,7 @@ import RoleSelectModal from './components/RoleSelectModal';
 import CoordinationTab from './components/CoordinationTab';
 import CurriculumProgressTab from './components/CurriculumProgressTab';
 import LogbookTab from './components/LogbookTab';
+import DocumentsTab from './components/DocumentsTab';
 import CoordinatorAdminTab from './components/CoordinatorAdminTab';
 import ReportPrintModal from './components/ReportPrintModal';
 import ChangePinModal from './components/ChangePinModal';
@@ -548,7 +549,12 @@ export default function App() {
               />
             )}
 
-            {/* Tab 4: Coordinator Admin */}
+            {/* Tab 4: Official Documents & Direct Downloads (المكتبة التربوية) */}
+            {activeTab === 'documents' && (
+              <DocumentsTab config={config} />
+            )}
+
+            {/* Tab 5: Coordinator Admin */}
             {activeTab === 'admin' && currentRole === 'coordinator' && (
               <CoordinatorAdminTab
                 teachers={teachers}

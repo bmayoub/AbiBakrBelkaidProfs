@@ -304,3 +304,4 @@ if __name__ == '__main__':
     with open('extracted_syllabus_preview.json', 'w', encoding='utf-8') as f:
         json.dump(all_data, f, ensure_ascii=False, indent=2)
     print("\nSaved extracted preview to extracted_syllabus_preview.json")
+
