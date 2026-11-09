@@ -78,6 +78,11 @@ export default function CurriculumProgressTab({
   const assignedTeacher = selectedClass ? teachers.find((t) => t.id === selectedClass.teacherId) : null;
   const currentClassDelay = selectedClass ? delays[selectedClass.id] : null;
 
+  // Permission check: only the assigned teacher of this class can toggle progress and manage delays.
+  // Coordinator can view all classes, but can only edit progress for their own assigned classes.
+  const isClassTeacher = Boolean(selectedClass && currentUser?.id && selectedClass.teacherId === currentUser.id);
+  const canEditProgress = isClassTeacher;
+
   // Checked weeks for selected class
   const checkedWeeks = progress[selectedClassId] || [];
 
@@ -312,18 +317,30 @@ export default function CurriculumProgressTab({
                 const pct = calculateClassPercentage(cls);
                 const isSelected = cls.id === selectedClassId;
                 const hasDelay = delays[cls.id];
+                const isMyAssignedClass = cls.teacherId === currentUser?.id;
 
                 return (
                   <button
                     key={cls.id}
                     onClick={() => setSelectedClassId(cls.id)}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-indigo-600 text-white shadow-md scale-102'
+                        : isMyAssignedClass && currentRole === 'coordinator'
+                        ? 'bg-emerald-50/80 hover:bg-emerald-100/80 text-emerald-950 border border-emerald-300'
                         : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
                     }`}
                   >
-                    <span>{cls.name}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span>{cls.name}</span>
+                      {currentRole === 'coordinator' && isMyAssignedClass && (
+                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-extrabold ${
+                          isSelected ? 'bg-white/25 text-white' : 'bg-emerald-200 text-emerald-800'
+                        }`}>
+                          قسمي
+                        </span>
+                      )}
+                    </div>
                     <span
                       className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
                         isSelected ? 'bg-white/20 text-white' : 'bg-indigo-50 text-indigo-700'
@@ -348,6 +365,37 @@ export default function CurriculumProgressTab({
 
           {selectedClass && selectedCurriculum && (
             <>
+              {/* Permission & Mode Notice Banner */}
+              {!canEditProgress ? (
+                <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 text-amber-950 text-xs shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-200 text-amber-800 flex items-center justify-center shrink-0">
+                      <Eye className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="font-bold flex items-center gap-2 text-amber-950">
+                        <span>وضع المعاينة والمتابعة البيداغوجية</span>
+                        <span className="text-[10px] bg-amber-200/90 text-amber-900 px-2 py-0.5 rounded-full font-extrabold">
+                          للمعاينة فقط (محمي من التعديل)
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-amber-800 mt-0.5">
+                        هذا القسم مسند للأستاذ(ة): <strong className="font-extrabold text-amber-950">{assignedTeacher?.name || 'غير مسند'}</strong>. التأشير على الأسابيع وتسجيل التأخر متاح حصراً لأستاذ القسم.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-2 text-emerald-950 text-xs shadow-xs">
+                  <div className="flex items-center gap-2.5 font-bold">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>
+                      هذا القسم مسند إليك <strong className="font-extrabold text-emerald-900">({selectedClass.name})</strong> — يمكنك التأشير على الأسابيع المنجزة وحفظ التأخر والاستدراك.
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Progress Summary Card */}
               <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
@@ -409,12 +457,27 @@ export default function CurriculumProgressTab({
                   </div>
 
                   {/* Right: Quick Instructions */}
-                  <div className="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-4 text-xs text-indigo-900 leading-relaxed">
-                    <div className="flex items-center gap-1.5 font-bold mb-1.5 text-indigo-800">
-                      <CalendarCheck className="w-4 h-4" />
-                      <span>طريقة التأشير:</span>
+                  <div className={`border rounded-2xl p-4 text-xs leading-relaxed ${
+                    canEditProgress
+                      ? 'bg-indigo-50/60 border-indigo-100 text-indigo-900'
+                      : 'bg-slate-50 border-slate-200 text-slate-700'
+                  }`}>
+                    <div className="flex items-center gap-1.5 font-bold mb-1.5">
+                      {canEditProgress ? (
+                        <>
+                          <CalendarCheck className="w-4 h-4 text-indigo-800" />
+                          <span className="text-indigo-800">طريقة التأشير:</span>
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-4 h-4 text-slate-600" />
+                          <span className="text-slate-800">متابعة تقدم الأستاذ:</span>
+                        </>
+                      )}
                     </div>
-                    اضغط على خانة الاختيار بجانب الأسبوع الذي أتممت تدريسه مع تلاميذ هذا القسم. سيتم تحديث النسبة المئوية الرسمية فوراً وحفظها في قاعدة البيانات.
+                    {canEditProgress
+                      ? 'اضغط على خانة الاختيار بجانب الأسبوع الذي أتممت تدريسه مع تلاميذ هذا القسم. سيتم تحديث النسبة المئوية الرسمية فوراً وحفظها في قاعدة البيانات.'
+                      : `يمكنك هنا متابعة التدرج المنجز من طرف الزميل (${assignedTeacher?.name || 'أستاذ الفوج'}). لتعديل التأشير يجب أن يتم من حساب أستاذ هذا القسم.`}
                   </div>
                 </div>
               </div>
@@ -451,21 +514,30 @@ export default function CurriculumProgressTab({
 
                   {/* Actions for delay */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleOpenDelayModal}
-                      className="px-3 py-1.5 rounded-xl bg-white text-amber-900 hover:bg-amber-100 border border-amber-200 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
-                    >
-                      <Edit3 className="w-3.5 h-3.5 text-amber-700" />
-                      <span>تعديل السبب</span>
-                    </button>
-                    <button
-                      onClick={handleDeleteDelayClick}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
-                      title="تم استدراك التأخر بنجاح"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>تم الاستدراك</span>
-                    </button>
+                    {canEditProgress ? (
+                      <>
+                        <button
+                          onClick={handleOpenDelayModal}
+                          className="px-3 py-1.5 rounded-xl bg-white text-amber-900 hover:bg-amber-100 border border-amber-200 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-amber-700" />
+                          <span>تعديل السبب</span>
+                        </button>
+                        <button
+                          onClick={handleDeleteDelayClick}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                          title="تم استدراك التأخر بنجاح"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>تم الاستدراك</span>
+                        </button>
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-xs text-amber-900 bg-amber-100/80 border border-amber-300 px-3 py-1.5 rounded-xl font-bold">
+                        <Eye className="w-3.5 h-3.5 text-amber-700" />
+                        <span>مسجل بواسطة: {assignedTeacher?.name || 'أستاذ القسم'}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -474,16 +546,24 @@ export default function CurriculumProgressTab({
                   <div className="flex items-center gap-2 text-slate-600">
                     <AlertCircle className="w-4 h-4 text-slate-400" />
                     <span>
-                      هل يواجه هذا القسم تأخراً عن التوزيع السنوي الرسمي؟
+                      {canEditProgress
+                        ? 'هل يواجه هذا القسم تأخراً عن التوزيع السنوي الرسمي؟'
+                        : 'لم يسجل أستاذ هذا القسم أي تأخر بيداغوجي حتى الآن.'}
                     </span>
                   </div>
-                  <button
-                    onClick={handleOpenDelayModal}
-                    className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
-                  >
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>تسجيل سبب التأخر وخطة الاستدراك</span>
-                  </button>
+                  {canEditProgress ? (
+                    <button
+                      onClick={handleOpenDelayModal}
+                      className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                    >
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      <span>تسجيل سبب التأخر وخطة الاستدراك</span>
+                    </button>
+                  ) : (
+                    <span className="text-[11px] text-slate-400 font-bold">
+                      (تسجيل التأخر محجوز لأستاذ الفوج)
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -553,13 +633,20 @@ export default function CurriculumProgressTab({
                         return (
                           <tr
                             key={index}
-                            onClick={() => !isHoliday && onToggleWeek(selectedClass.id, w.num)}
+                            onClick={() => {
+                              if (!canEditProgress || isHoliday) return;
+                              onToggleWeek(selectedClass.id, w.num);
+                            }}
                             className={`transition-colors select-none ${
                               isHoliday
                                 ? 'bg-amber-50/50 text-amber-900'
                                 : isChecked
-                                ? 'bg-indigo-50/40 text-slate-900 cursor-pointer active:bg-indigo-100/60'
-                                : 'hover:bg-slate-50/80 text-slate-700 cursor-pointer active:bg-slate-100'
+                                ? canEditProgress
+                                  ? 'bg-indigo-50/40 text-slate-900 cursor-pointer active:bg-indigo-100/60'
+                                  : 'bg-indigo-50/20 text-slate-900 cursor-default'
+                                : canEditProgress
+                                ? 'hover:bg-slate-50/80 text-slate-700 cursor-pointer active:bg-slate-100'
+                                : 'text-slate-700 cursor-default'
                             }`}
                           >
                             {/* Checkbox */}
@@ -567,15 +654,24 @@ export default function CurriculumProgressTab({
                               {!isHoliday ? (
                                 <button
                                   type="button"
+                                  disabled={!canEditProgress}
+                                  title={
+                                    !canEditProgress
+                                      ? 'التأشير متاح فقط لأستاذ القسم المسند'
+                                      : isChecked
+                                      ? 'إلغاء التأشير'
+                                      : 'تأشير الأسبوع كمنجز'
+                                  }
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    if (!canEditProgress) return;
                                     onToggleWeek(selectedClass.id, w.num);
                                   }}
                                   className={`w-7 h-7 sm:w-6 sm:h-6 rounded-lg border flex items-center justify-center transition-all mx-auto ${
                                     isChecked
                                       ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
                                       : 'border-slate-300 bg-white hover:border-indigo-400'
-                                  }`}
+                                  } ${!canEditProgress ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
                                 >
                                   {isChecked ? (
                                     <CheckSquare className="w-4 h-4" />

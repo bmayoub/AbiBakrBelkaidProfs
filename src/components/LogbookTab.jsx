@@ -21,7 +21,8 @@ import {
   Edit3,
   Trash2,
   FolderPlus,
-  Plus
+  Plus,
+  Eye
 } from 'lucide-react';
 import { SYLLABUS_DATA } from '../data/syllabusData';
 import LogbookPrintModal from './LogbookPrintModal';
@@ -120,15 +121,20 @@ export default function LogbookTab({
 
   const completionPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
+  // Permission check: only the assigned teacher can toggle lessons or units as completed.
+  // The coordinator can view all classes across the school, but can only edit progress for their own assigned classes.
+  const isClassTeacher = Boolean(currentClass && currentUser?.id && currentClass.teacherId === currentUser.id);
+  const canEditClass = isClassTeacher;
+
   // Toggle single item
   const handleItemClick = (itemId) => {
-    if (!currentClass) return;
+    if (!canEditClass || !currentClass) return;
     onToggleItem(currentClass.id, itemId);
   };
 
   // Toggle all items in a unit
   const handleUnitToggleAll = (unit, markCompleted) => {
-    if (!currentClass || !unit.items) return;
+    if (!canEditClass || !currentClass || !unit.items) return;
     const itemIds = unit.items.map((it) => it.id);
     onToggleUnit(currentClass.id, itemIds, markCompleted);
   };
@@ -304,11 +310,14 @@ export default function LogbookTab({
                 onChange={(e) => setSelectedClassId(e.target.value)}
                 className="bg-transparent font-black text-slate-800 text-xs sm:text-sm focus:outline-hidden cursor-pointer w-full"
               >
-                {myClasses.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {cls.name} ({cls.stream || cls.streamId})
-                  </option>
-                ))}
+                {myClasses.map((cls) => {
+                  const isMine = cls.teacherId === currentUser?.id;
+                  return (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name} ({cls.stream || cls.streamId}) {currentRole === 'coordinator' ? (isMine ? ' ★ (قسمي - متاح التأشير)' : ' 👁 (للمعاينة فقط)') : ''}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
@@ -398,6 +407,37 @@ export default function LogbookTab({
           </div>
         </div>
       </div>
+
+      {/* Permission & Mode Notice Banner */}
+      {!canEditClass ? (
+        <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 text-amber-950 text-xs shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-200 text-amber-800 flex items-center justify-center shrink-0">
+              <Eye className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-bold flex items-center gap-2 text-amber-950">
+                <span>وضع المعاينة والمتابعة لدفتر النصوص</span>
+                <span className="text-[10px] bg-amber-200/90 text-amber-900 px-2 py-0.5 rounded-full font-extrabold">
+                  للمعاينة فقط (محمي من التعديل)
+                </span>
+              </div>
+              <p className="text-[11px] text-amber-800 mt-0.5">
+                هذا القسم مسند للأستاذ(ة): <strong className="font-extrabold text-amber-950">{assignedTeacher?.name || 'غير مسند'}</strong>. التأشير على الدروس وتحديد إنجاز الوحدات متاح حصراً لأستاذ القسم.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-2 text-emerald-950 text-xs shadow-xs">
+          <div className="flex items-center gap-2.5 font-bold">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>
+              دفتر نصوص قسمك <strong className="font-extrabold text-emerald-900">({currentClass?.name})</strong> — يمكنك التأشير على الدروس المنجزة وتحديد إنجاز الوحدات.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-3 rounded-2xl border border-slate-200 flex flex-wrap items-center justify-between gap-3">
@@ -562,25 +602,33 @@ export default function LogbookTab({
                       </button>
                     )}
 
-                    <button
-                      type="button"
-                      onClick={() => handleUnitToggleAll(unit, true)}
-                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition cursor-pointer flex items-center gap-1"
-                      title="التأشير على جميع دروس هذه الوحدة كمنجزة"
-                    >
-                      <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>تأشير الكل</span>
-                    </button>
+                    {canEditClass ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleUnitToggleAll(unit, true)}
+                          className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition cursor-pointer flex items-center gap-1"
+                          title="التأشير على جميع دروس هذه الوحدة كمنجزة"
+                        >
+                          <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>تأشير الكل</span>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleUnitToggleAll(unit, false)}
-                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer flex items-center gap-1"
-                      title="إلغاء التأشير عن دروس هذه الوحدة"
-                    >
-                      <RotateCcw className="w-3 h-3 text-slate-500" />
-                      <span>إلغاء الكل</span>
-                    </button>
+                        <button
+                          type="button"
+                          onClick={() => handleUnitToggleAll(unit, false)}
+                          className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer flex items-center gap-1"
+                          title="إلغاء التأشير عن دروس هذه الوحدة"
+                        >
+                          <RotateCcw className="w-3 h-3 text-slate-500" />
+                          <span>إلغاء الكل</span>
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-2.5 py-1 rounded-lg">
+                        معاينة فقط
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -606,26 +654,39 @@ export default function LogbookTab({
                         return (
                           <tr
                             key={item.id || itemIdx}
-                            onClick={() => handleItemClick(item.id)}
-                            className={`transition cursor-pointer select-none ${
+                            onClick={() => canEditClass && handleItemClick(item.id)}
+                            className={`transition select-none ${
                               isChecked
-                                ? 'bg-emerald-50/40 hover:bg-emerald-50/70 text-slate-900'
-                                : 'hover:bg-slate-50 text-slate-700'
+                                ? canEditClass
+                                  ? 'bg-emerald-50/40 hover:bg-emerald-50/70 text-slate-900 cursor-pointer'
+                                  : 'bg-emerald-50/30 text-slate-900 cursor-default'
+                                : canEditClass
+                                ? 'hover:bg-slate-50 text-slate-700 cursor-pointer'
+                                : 'text-slate-700 cursor-default'
                             }`}
                           >
                             {/* Checkbox */}
                             <td className="py-2.5 sm:py-3 px-2 sm:px-4 text-center">
                               <button
                                 type="button"
+                                disabled={!canEditClass}
+                                title={
+                                  !canEditClass
+                                    ? 'التأشير متاح فقط لأستاذ القسم المسند'
+                                    : isChecked
+                                    ? 'إلغاء التأشير'
+                                    : 'تأشير الدرس كمنجز'
+                                }
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  if (!canEditClass) return;
                                   handleItemClick(item.id);
                                 }}
-                                className={`w-7 h-7 sm:w-6 sm:h-6 rounded-lg border flex items-center justify-center transition-all mx-auto cursor-pointer ${
+                                className={`w-7 h-7 sm:w-6 sm:h-6 rounded-lg border flex items-center justify-center transition-all mx-auto ${
                                   isChecked
                                     ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                                     : 'border-slate-300 bg-white hover:border-emerald-400'
-                                }`}
+                                } ${!canEditClass ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
                               >
                                 {isChecked ? (
                                   <CheckSquare className="w-4 h-4" />
